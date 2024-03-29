@@ -17,3 +17,6 @@ git.stage:
 
 git.commit:
 	git -C $(git.PATH) commit
+
+git.push:
+	git -C $(git.PATH) push
