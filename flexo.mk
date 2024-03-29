@@ -95,3 +95,15 @@ $(call flexo.discover,$(FLEXO.PLUGINS_DIR))
 
 $(call flexo.debug,Available Plugins: $(FLEXO.PLUGINS))
 
+define flexo.add
+$(if $1,,$(call flexo.error,ARG1 [plugin_name] not specified for function $0))
+$(if $(filter $1,$(FLEXO.PLUGINS)),,\
+	$(call flexo.error,Plugin '$1' not found. Available plugins: $(FLEXO.PLUGINS)))
+$(eval FLEXO.VARIABLES.ORIG := $(.VARIABLES))
+$(eval include $($(1).flexo.mk))
+$(if $(filter-out FLEXO.VARIABLES.ORIG $(1).% $(FLEXO.VARIABLES.ORIG),$(.VARIABLES)),\
+	$(call flexo.error,Flexo Plugin '$(1)' defined illegal variables: $(filter-out FLEXO.VARIABLES.ORIG $(1).% $(FLEXO.VARIABLES.ORIG),$(.VARIABLES))),\
+	$(call flexo.debug,Flexo Plugin '$(1)' loaded successfully)\
+)
+$(eval FLEXO.VARIABLES.ORIG :=)
+endef
