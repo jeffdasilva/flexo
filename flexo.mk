@@ -36,10 +36,6 @@ endef
 define toupper
 $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f,F,$(subst g,G,$(subst h,H,$(subst i,I,$(subst j,J,$(subst k,K,$(subst l,L,$(subst m,M,$(subst n,N,$(subst o,O,$(subst p,P,$(subst q,Q,$(subst r,R,$(subst s,S,$(subst t,T,$(subst u,U,$(subst v,V,$(subst w,W,$(subst x,X,$(subst y,Y,$(subst z,Z,$1))))))))))))))))))))))))))
 endef
-
-FLEXO.VERBOSE ?= $(VERBOSE)
-QUIET = $(if $(call flexo.true,$(FLEXO.VERBOSE)),,@)
-
 ###############################################################################
 
 define flexo.true
@@ -62,6 +58,8 @@ define flexo.error
 $(error FLEXO_ERROR: $(1))
 endef
 
+FLEXO.VERBOSE ?= $(VERBOSE)
+QUIET = $(if $(call flexo.true,$(FLEXO.VERBOSE)),,@)
 
 ifneq ($(filter flexo.update,$(FLEXO.MAKECMDGOALS)),)
 .PHONY: flexo.update
@@ -77,14 +75,14 @@ $(foreach plugin_dir,$1,\
 	$(eval plugin_dir_abs = $(abspath $(plugin_dir)))
 
 	$(foreach plugin_mk,$(wildcard $(plugin_dir_abs)/*/flexo.mk),\
-      $(eval plugin_name = $(patsubst $(plugin_dir_abs)/%/flexo.mk,%,$(plugin_mk)))
+    	$(eval plugin_name = $(patsubst $(plugin_dir_abs)/%/flexo.mk,%,$(plugin_mk)))
 	  
-	  $(if $(filter $(plugin_name),$(FLEXO.PLUGINS)),\
-	     $(call flexo.warning,Plugin $(plugin_name) already loaded. Skipping...),\
-	     $(call flexo.debug,Discover Plugin: $(plugin_name)))
-
-	  $(eval FLEXO.PLUGINS += $(plugin_name))
-	  $(eval $(plugin_name).flexo.mk := $(abspath $(plugin_mk)))
+	  	$(if $(filter $(plugin_name),$(FLEXO.PLUGINS)),\
+	    	$(call flexo.warning,Plugin $(plugin_name) already loaded. Skipping...),\
+	    	$(call flexo.debug,Discover Plugin: $(plugin_name))\
+			  $(eval FLEXO.PLUGINS += $(plugin_name))\
+	  		  $(eval $(plugin_name).flexo.mk := $(abspath $(plugin_mk)))\
+		)
    )
 ))
 endef
@@ -95,6 +93,5 @@ endif
 FLEXO.PLUGINS := 
 $(call flexo.discover,$(FLEXO.PLUGINS_DIR))
 
-#$(patsubst $(FLEXO.PLUGINS_DIR)/%/flexo.mk,%,$(wildcard $(FLEXO.PLUGINS_DIR)/*/flexo.mk))
 $(call flexo.debug,Available Plugins: $(FLEXO.PLUGINS))
 
