@@ -21,14 +21,16 @@ endef
 
 ################
 # Example Usage:
-# $(call stack.push,SOME_VAR,1 2 3)
-# $(call stack.push,SOME_VAR,4 5 6)
-# $(call stack.push,SOME_VAR,7 8 9)
-# $(call stack.pop,SOME_VAR)
-# $(info SOME_VAR is $(SOME_VAR))
-# $(call stack.pop,SOME_VAR)
-# $(info SOME_VAR is $(SOME_VAR))
-# $(call stack.pop,SOME_VAR)
-# $(info SOME_VAR is $(SOME_VAR))
-# undefine SOME_VAR
-################
+ifeq ($(STACK.DEMO),YES)
+$(call stack.push,SOME_VAR,1 2 3)
+$(call stack.push,SOME_VAR,4 5 6)
+$(call stack.push,SOME_VAR,7 8 9)
+$(call stack.pop,SOME_VAR)
+$(info SOME_VAR is $(SOME_VAR))
+$(call stack.pop,SOME_VAR)
+$(info SOME_VAR is $(SOME_VAR))
+$(call stack.pop,SOME_VAR)
+$(info SOME_VAR is $(SOME_VAR))
+undefine SOME_VAR
+endif
+##############

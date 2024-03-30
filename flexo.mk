@@ -4,18 +4,29 @@
 # flexo.mk - The main entry makefile fragement
 #
 # Code licensed under MIT 2024 (c) Jeff DaSilva
+#
+# I highly recommend never touching this file once it's all working.
+#   => VERY VERY FRAGILE Code in here!
+#
 ###############################################################################
 
-ifneq ($(FLEXO.ROOT_DIR),)
-$(error ERROR: FLEXO.ROOT_DIR already defined. This makefile should be included only once)
+ifneq ($(flexo.root_dir),)
+$(error ERROR: flexo.root_dir already defined. This makefile should be included only once)
 endif
 
-FLEXO.ROOT_MAKEFILE := $(abspath $(subst \,/,$(lastword $(MAKEFILE_LIST))))
-FLEXO.ROOT_DIR := $(patsubst %/,%,$(dir $(FLEXO.ROOT_MAKEFILE)))
-FLEXO.PLUGINS_DIR += $(FLEXO.ROOT_DIR)/plugins
+flexo.root.mk := $(abspath $(subst \,/,$(lastword $(MAKEFILE_LIST))))
+flexo.root_dir := $(patsubst %/,%,$(dir $(flexo.root.mk)))
 
+############################
+#
+# Allowed global scoped variables
+# FLEXO.DEBUG FLEXO.PLUGINS FLEXO.VERBOSE
+#
+# "Static" scoped variables that will be undefined befere this makefile exists
+FLEXO.PLUGINS_DIR := $(flexo.root_dir)/plugins
 FLEXO.MAKECMDGOALS := $(filter flexo.%,$(MAKECMDGOALS))
 FLEXO.VARIABLES_INIT := $(.VARIABLES)
+############################
 
 ###############################################################################
 # Stuff that gnu make should enable by default (in my opinion) 
@@ -37,7 +48,7 @@ define toupper
 $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f,F,$(subst g,G,$(subst h,H,$(subst i,I,$(subst j,J,$(subst k,K,$(subst l,L,$(subst m,M,$(subst n,N,$(subst o,O,$(subst p,P,$(subst q,Q,$(subst r,R,$(subst s,S,$(subst t,T,$(subst u,U,$(subst v,V,$(subst w,W,$(subst x,X,$(subst y,Y,$(subst z,Z,$1))))))))))))))))))))))))))
 endef
 
-# if you don't already have a default target then "all" will be the default target
+# If you don't already have a default target then "all" will be the default target
 .PHONY: all
 all:
 
@@ -63,6 +74,10 @@ define flexo.error
 $(error FLEXO_ERROR: $(1))
 endef
 
+define flexo.debug.call
+$(call flexo.debug,::$0($(if $1,$1)$(if $2,$(COMMA)$2))::)
+endef
+
 FLEXO.VERBOSE ?= $(VERBOSE)
 QUIET = $(if $(call flexo.true,$(FLEXO.VERBOSE)),,@)
 
@@ -70,13 +85,14 @@ ifneq ($(filter flexo.update,$(FLEXO.MAKECMDGOALS)),)
 .PHONY: flexo.update
 flexo.update:
 	@echo "Updating Flexo..."
-	$(QUIET)git -C $(FLEXO.ROOT_DIR) pull
+	$(QUIET)git -C $(flexo.root_dir) pull
 endif
 
 # arg 1: plugin name
 # arg 2: plugin makefile
 define flexo.discover_plugin
 $(strip \
+$(flexo.debug.call)
 $(if $1,,$(call flexo.error,ARG1 [plugin_name] not specified for function $0))
 $(if $2,,$(call flexo.error,ARG2 [plugin_mk] not specified for function $0))
 $(eval plugin_name = $1)
@@ -92,6 +108,7 @@ endef
 # arg 1: plugin directory
 define flexo.discover
 $(strip \
+$(flexo.debug.call)
 $(if $1,,$(call flexo.error,ARG1 [plugin_dir] not specified for function $0))
 $(foreach plugin_dir,$1,\
 	$(eval plugin_dir_abs = $(abspath $(plugin_dir)))
@@ -129,7 +146,13 @@ $(flexo.$1.mk)
 )
 endef
 
+# need to cheat and preload the builtins stack plugin because it is used by the plugin loader
+include $(flexo.root_dir)/plugins/builtins/flexo.mk
+
+# ToDo: Be sure not to load it twice
 define flexo.add
+$(strip \
+$(flexo.debug.call)
 $(if $1,,$(call flexo.error,ARG1 [plugin_name] not specified for function $0))
 $(flexo.assert_is_plugin,$1)
 $(eval FLEXO.VARIABLES.ORIG := $(.VARIABLES))
@@ -138,10 +161,25 @@ $(if $(filter-out FLEXO.VARIABLES.ORIG flexo.% $(1).% $(FLEXO.VARIABLES.ORIG),$(
 	$(call flexo.error,Flexo Plugin '$(1)' defined illegal variables: $(filter-out FLEXO.VARIABLES.ORIG flexo.% $(1).% $(FLEXO.VARIABLES.ORIG),$(.VARIABLES))),\
 	$(call flexo.debug,Flexo Plugin '$(1)' loaded successfully)\
 )
-$(eval FLEXO.VARIABLES.ORIG :=)
+$(eval undefine FLEXO.VARIABLES.ORIG)
+)
 endef
 
 $(call flexo.add,builtins)
 
 # move this into builtins if you can
 $(call flexo.add,stack)
+
+
+############################
+# unset the "Static" scope variables
+undefine FLEXO.PLUGINS_DIR
+undefine FLEXO.MAKECMDGOALS
+undefine FLEXO.VARIABLES_INIT
+
+FLEXO.ILLEGAL_SCOPE_VARIALBES := $(filter-out FLEXO.DEBUG FLEXO.PLUGINS FLEXO.VERBOSE,$(filter FLEXO.%,$(.VARIABLES)))
+ifneq ($(FLEXO.ILLEGAL_SCOPE_VARIALBES),)
+$(call flexo.error,Illegal variables defined in global scope: $(FLEXO.ILLEGAL_SCOPE_VARIALBES))
+endif
+undefine FLEXO.ILLEGAL_SCOPE_VARIALBES
+############################
