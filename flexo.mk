@@ -36,6 +36,11 @@ endef
 define toupper
 $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f,F,$(subst g,G,$(subst h,H,$(subst i,I,$(subst j,J,$(subst k,K,$(subst l,L,$(subst m,M,$(subst n,N,$(subst o,O,$(subst p,P,$(subst q,Q,$(subst r,R,$(subst s,S,$(subst t,T,$(subst u,U,$(subst v,V,$(subst w,W,$(subst x,X,$(subst y,Y,$(subst z,Z,$1))))))))))))))))))))))))))
 endef
+
+# if you don't already have a default target then "all" will be the default target
+.PHONY: all
+all:
+
 ###############################################################################
 
 define flexo.true
@@ -75,13 +80,14 @@ $(foreach plugin_dir,$1,\
 	$(eval plugin_dir_abs = $(abspath $(plugin_dir)))
 
 	$(foreach plugin_mk,$(wildcard $(plugin_dir_abs)/*/flexo.mk),\
-    	$(eval plugin_name = $(patsubst $(plugin_dir_abs)/%/flexo.mk,%,$(plugin_mk)))
-	  
+
+		$(eval plugin_name = $(patsubst $(plugin_dir_abs)/%/flexo.mk,%,$(plugin_mk)))
+
 	  	$(if $(filter $(plugin_name),$(FLEXO.PLUGINS)),\
 	    	$(call flexo.warning,Plugin $(plugin_name) already loaded. Skipping...),\
 	    	$(call flexo.debug,Discover Plugin: $(plugin_name))\
-			  $(eval FLEXO.PLUGINS += $(plugin_name))\
-	  		  $(eval $(plugin_name).flexo.mk := $(abspath $(plugin_mk)))\
+				$(eval FLEXO.PLUGINS += $(plugin_name))\
+				$(eval flexo.$(plugin_name).mk := $(abspath $(plugin_mk)))\
 		)
    )
 ))
@@ -95,15 +101,36 @@ $(call flexo.discover,$(FLEXO.PLUGINS_DIR))
 
 $(call flexo.debug,Available Plugins: $(FLEXO.PLUGINS))
 
-define flexo.add
-$(if $1,,$(call flexo.error,ARG1 [plugin_name] not specified for function $0))
+define flexo.assert_is_plugin
+$(strip \
 $(if $(filter $1,$(FLEXO.PLUGINS)),,\
 	$(call flexo.error,Plugin '$1' not found. Available plugins: $(FLEXO.PLUGINS)))
+)
+endef
+
+define flexo.makefile
+$(strip \
+$(if $1,,$(call flexo.error,ARG1 [plugin_name] not specified for function $0))
+$(flexo.assert_is_plugin,$1)
+$(if $(flexo.$1.mk),,$(call flexo.error,Plugin '$1' does not have a makefile defined))
+$(if $(wildcard $(flexo.$1.mk)),,$(call flexo.error,Plugin '$1' makefile not found: $(flexo.$1.mk)))
+$(flexo.$1.mk)
+)
+endef
+
+define flexo.add
+$(if $1,,$(call flexo.error,ARG1 [plugin_name] not specified for function $0))
+$(flexo.assert_is_plugin,$1)
 $(eval FLEXO.VARIABLES.ORIG := $(.VARIABLES))
-$(eval include $($(1).flexo.mk))
-$(if $(filter-out FLEXO.VARIABLES.ORIG $(1).% $(FLEXO.VARIABLES.ORIG),$(.VARIABLES)),\
-	$(call flexo.error,Flexo Plugin '$(1)' defined illegal variables: $(filter-out FLEXO.VARIABLES.ORIG $(1).% $(FLEXO.VARIABLES.ORIG),$(.VARIABLES))),\
+$(eval include $(call flexo.makefile,$1))
+$(if $(filter-out FLEXO.VARIABLES.ORIG flexo.% $(1).% $(FLEXO.VARIABLES.ORIG),$(.VARIABLES)),\
+	$(call flexo.error,Flexo Plugin '$(1)' defined illegal variables: $(filter-out FLEXO.VARIABLES.ORIG flexo.% $(1).% $(FLEXO.VARIABLES.ORIG),$(.VARIABLES))),\
 	$(call flexo.debug,Flexo Plugin '$(1)' loaded successfully)\
 )
 $(eval FLEXO.VARIABLES.ORIG :=)
 endef
+
+$(call flexo.add,builtins)
+
+# move this into builtins if you can
+$(call flexo.add,stack)
