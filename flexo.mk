@@ -73,23 +73,34 @@ flexo.update:
 	$(QUIET)git -C $(FLEXO.ROOT_DIR) pull
 endif
 
+# arg 1: plugin name
+# arg 2: plugin makefile
+define flexo.discover_plugin
+$(strip \
+$(if $1,,$(call flexo.error,ARG1 [plugin_name] not specified for function $0))
+$(if $2,,$(call flexo.error,ARG2 [plugin_mk] not specified for function $0))
+$(eval plugin_name = $1)
+$(eval plugin_mk = $2)
+$(if $(filter $(plugin_name),$(FLEXO.PLUGINS)),\
+	$(call flexo.debug,Plugin $(plugin_name) already loaded. Skipping...),\
+	$(call flexo.debug,Discover Plugin: $(plugin_name))\
+		$(eval FLEXO.PLUGINS += $(plugin_name))\
+		$(eval flexo.$(plugin_name).mk := $(abspath $(plugin_mk)))\
+))
+endef
+
+# arg 1: plugin directory
 define flexo.discover
 $(strip \
 $(if $1,,$(call flexo.error,ARG1 [plugin_dir] not specified for function $0))
 $(foreach plugin_dir,$1,\
 	$(eval plugin_dir_abs = $(abspath $(plugin_dir)))
-
-	$(foreach plugin_mk,$(wildcard $(plugin_dir_abs)/*/flexo.mk),\
-
-		$(eval plugin_name = $(patsubst $(plugin_dir_abs)/%/flexo.mk,%,$(plugin_mk)))
-
-	  	$(if $(filter $(plugin_name),$(FLEXO.PLUGINS)),\
-	    	$(call flexo.warning,Plugin $(plugin_name) already loaded. Skipping...),\
-	    	$(call flexo.debug,Discover Plugin: $(plugin_name))\
-				$(eval FLEXO.PLUGINS += $(plugin_name))\
-				$(eval flexo.$(plugin_name).mk := $(abspath $(plugin_mk)))\
+	$(foreach plugin_subdir,$(patsubst $(plugin_dir)/%,%,$(wildcard $(plugin_dir)/*)),\
+		$(foreach plugin_mk,$(wildcard $(plugin_dir_abs)/$(plugin_subdir)/flexo.mk) $(wildcard $(plugin_dir_abs)/$(plugin_subdir)/$(plugin_subdir).mk),\
+			$(eval plugin_name = $(plugin_subdir))
+			$(call flexo.discover_plugin,$(plugin_name),$(plugin_mk))
 		)
-   )
+	)
 ))
 endef
 
