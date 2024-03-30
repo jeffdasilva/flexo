@@ -29,7 +29,7 @@ FLEXO.VARIABLES_INIT := $(.VARIABLES)
 ############################
 
 ###############################################################################
-# Stuff that gnu make should enable by default (in my opinion) 
+# Stuff that gnu make should enable by default (in my opinion)
 .SUFFIXES:
 .DELETE_ON_ERROR:
 .SECONDEXPANSION:
@@ -124,7 +124,7 @@ endef
 ifneq ($(FLEXO.PLUGINS),)
 $(call flexo.error,FLEXO.PLUGINS already set [$(FLEXO.PLUGINS)]. This is not expected)
 endif
-FLEXO.PLUGINS := 
+FLEXO.PLUGINS :=
 $(call flexo.discover,$(FLEXO.PLUGINS_DIR))
 
 $(call flexo.debug,Available Plugins: $(FLEXO.PLUGINS))
