@@ -25,7 +25,7 @@ git.stage-diff:
 	$(git.cmd) diff --cached
 
 .PHONY: git.reset-to-last-commit
-git.git.reset-to-last-commit:
+git.reset-to-last-commit:
 	$(git.cmd) reset HEAD .
 
 .PHONY: sync
