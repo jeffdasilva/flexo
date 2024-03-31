@@ -7,7 +7,9 @@ formatter.remove-trailing-whitespace: $(patsubst %,%.formatter.remove-trailing-w
 
 .PHONY: $(patsubst %,%.formatter.remove-trailing-whitespace,$(formatter.files))
 $(patsubst %,%.formatter.remove-trailing-whitespace,$(formatter.files)): %.formatter.remove-trailing-whitespace: %
-	@echo "Removing trailing whitespace from $<..."
+	@if grep -q '[[:space:]]$$' $<; then \
+		echo "Removing trailing whitespace from $<..."; \
+	fi
 	$(QUIET)sed -i 's/[[:space:]]*$$//' $<
 
 .PHONY: format

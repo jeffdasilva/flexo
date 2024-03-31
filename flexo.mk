@@ -52,6 +52,9 @@ endef
 .PHONY: all
 all:
 
+.PHONY: clean
+clean:
+
 ###############################################################################
 
 define flexo.true
@@ -147,7 +150,16 @@ $(flexo.$1.mk)
 endef
 
 # need to cheat and preload the builtins stack plugin because it is used by the plugin loader
-include $(flexo.root_dir)/plugins/builtins/flexo.mk
+#include $(flexo.root_dir)/plugins/builtins/flexo.mk
+
+flexo.illegal_variables = \
+	$(filter-out \
+		FLEXO.VARIABLES.$1 \
+			flexo.% \
+			$(1).% \
+			$(foreach plugin,$(flexo.plugins),$(plugin).%) \
+			$(FLEXO.VARIABLES.$1),\
+		$(.VARIABLES))
 
 # ToDo: Be sure not to load it twice
 define flexo.add
@@ -155,20 +167,21 @@ $(strip \
 $(flexo.debug.call)
 $(if $1,,$(call flexo.error,ARG1 [plugin_name] not specified for function $0))
 $(flexo.assert_is_plugin,$1)
-$(eval FLEXO.VARIABLES.ORIG := $(.VARIABLES))
+$(eval FLEXO.VARIABLES.$1 := $(.VARIABLES))
 $(eval include $(call flexo.makefile,$1))
-$(if $(filter-out FLEXO.VARIABLES.ORIG flexo.% $(1).% $(FLEXO.VARIABLES.ORIG),$(.VARIABLES)),\
-	$(call flexo.error,Flexo Plugin '$(1)' defined illegal variables: $(filter-out FLEXO.VARIABLES.ORIG flexo.% $(1).% $(FLEXO.VARIABLES.ORIG),$(.VARIABLES))),\
+$(if $(flexo.illegal_variables),\
+	$(call flexo.error,Flexo Plugin '$(1)' defined illegal variables: $(flexo.illegal_variables)),\
 	$(call flexo.debug,Flexo Plugin '$(1)' loaded successfully)\
 )
-$(eval undefine FLEXO.VARIABLES.ORIG)
+$(eval flexo.plugins += $1)
+$(eval undefine FLEXO.VARIABLES.$1)
 )
 endef
 
 $(call flexo.add,builtins)
 
-# move this into builtins if you can
-$(call flexo.add,stack)
+# move this into builtin0s if you can
+#$(call flexo.add,stack)
 
 
 ############################
