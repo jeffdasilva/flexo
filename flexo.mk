@@ -157,7 +157,7 @@ flexo.illegal_variables = \
 		FLEXO.VARIABLES.$1 \
 			flexo.% \
 			$(1).% \
-			$(foreach plugin,$(flexo.plugins),$(plugin).%) \
+			$(foreach plugin,$(flexo.plugins_loaded),$(plugin).%) \
 			$(FLEXO.VARIABLES.$1),\
 		$(.VARIABLES))
 
@@ -173,7 +173,7 @@ $(if $(flexo.illegal_variables),\
 	$(call flexo.error,Flexo Plugin '$(1)' defined illegal variables: $(flexo.illegal_variables)),\
 	$(call flexo.debug,Flexo Plugin '$(1)' loaded successfully)\
 )
-$(eval flexo.plugins += $1)
+$(eval flexo.plugins_loaded += $1)
 $(eval undefine FLEXO.VARIABLES.$1)
 )
 endef
@@ -190,6 +190,7 @@ undefine FLEXO.PLUGINS_DIR
 undefine FLEXO.MAKECMDGOALS
 undefine FLEXO.VARIABLES_INIT
 
+# ToDo: Elimiante FLEXO.PLUGINS
 FLEXO.ILLEGAL_SCOPE_VARIALBES := $(filter-out FLEXO.DEBUG FLEXO.PLUGINS FLEXO.VERBOSE,$(filter FLEXO.%,$(.VARIABLES)))
 ifneq ($(FLEXO.ILLEGAL_SCOPE_VARIALBES),)
 $(call flexo.error,Illegal variables defined in global scope: $(FLEXO.ILLEGAL_SCOPE_VARIALBES))

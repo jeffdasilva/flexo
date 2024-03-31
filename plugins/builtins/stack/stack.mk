@@ -21,7 +21,7 @@ endef
 
 ################
 # Example Usage:
-ifeq ($(STACK.DEMO),YES)
+ifeq ($(call flexo.true,$(STACK.DEMO)),T)
 $(call stack.push,SOME_VAR,1 2 3)
 $(call stack.push,SOME_VAR,4 5 6)
 $(call stack.push,SOME_VAR,7 8 9)
