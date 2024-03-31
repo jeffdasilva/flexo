@@ -4,7 +4,7 @@
 include ../flexo.mk
 
 $(call flexo.add,git)
-git.PATH := $(abspath ..)
+git.path = $(git.toplevel)
 
 $(call flexo.add,formatter)
 

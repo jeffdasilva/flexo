@@ -1,9 +1,13 @@
 
 git.exe ?= git
-git.cmd ?= $(git.exe) $(if $(git.PATH),-C $(git.PATH))
+
+git.toplevel = $(shell $(git.exe) rev-parse --show-toplevel 2>/dev/null)
+
+git.cmd ?= $(git.exe) $(if $(git.path),-C $(git.path))
+git.cmd_toplevel ?= $(git.exe) $(if $(git.toplevel),-C $(git.toplevel))
 
 git._ls-files = $(shell $(git.cmd) ls-files)
-git.ls-files = $(if $(git.PATH),$(addprefix $(git.PATH)/,$(git._ls-files)),$(git._ls-files))
+git.ls-files = $(if $(git.path),$(addprefix $(git.path)/,$(git._ls-files)),$(git._ls-files))
 
 .PHONY: sync
 sync: git.pull
@@ -21,3 +25,12 @@ $(git.ALIAS_TARGETS): git.%:
 .PHONY: git.stage
 git.stage:
 	$(git.cmd) add .
+
+.PHONY: git.stage-diff
+git.stage-diff:
+	$(git.cmd) diff --cached
+
+#.PHONY: git.unstage
+#git.unstage:
+#	$(git.cmd) reset HEAD .
+

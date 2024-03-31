@@ -5,8 +5,12 @@
 #
 # Code licensed under MIT 2024 (c) Jeff DaSilva
 #
-# I highly recommend never touching this file once it's all working.
-#   => VERY VERY FRAGILE Code in here!
+# I highly recommend never touching this file once it's all fully working.
+#
+#   => VERY VERY FRAGILE Code in here! I applogize in advance if you
+#      have to debug this file. I tried my best to make it as simple
+#      as I possibly could. If you don't know gnu make, then please
+#      stop reading now. This will just scare you away.
 #
 ###############################################################################
 
