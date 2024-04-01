@@ -7,10 +7,11 @@
 #
 # I highly recommend never touching this file once it's all fully working.
 #
-#   => VERY VERY FRAGILE Code in here! I applogize in advance if you
+#   => VERY VERY FRAGILE Code in here! I apologize in advance if you
 #      have to debug this file. I tried my best to make it as simple
 #      as I possibly could. If you don't know gnu make, then please
-#      stop reading now. This will just scare you away.
+#      stop reading now -- as this file will just scare you away from
+#      ever using gnu make.
 #
 ###############################################################################
 
@@ -106,14 +107,15 @@ $(if $1,,$(call flexo.error,ARG1 [plugin_name] not specified for function $0))
 $(if $2,,$(call flexo.error,ARG2 [plugin_mk] not specified for function $0))
 $(eval plugin_name = $1)
 $(eval plugin_mk = $2)
-$(if $(filter $(plugin_name),$(flexo.plugins) flexo),\
-	$(call flexo.debug,Plugin $(plugin_name) already loaded. Skipping...),\
+$(if $(filter $(plugin_name),$(flexo.plugins_discovered) flexo),\
+	$(call flexo.debug,Plugin '$(plugin_name)' already discovered. Skipping...),\
 	$(call flexo.debug,Discover Plugin: $(plugin_name))\
-		$(eval flexo.plugins += $(plugin_name))\
+		$(eval flexo.plugins_discovered += $(plugin_name))\
 		$(eval flexo.$(plugin_name).mk := $(abspath $(plugin_mk)))\
-))
+)
 $(eval undefine plugin_name)
 $(eval undefine plugin_mk)
+)
 endef
 
 # arg 1: plugin directory
@@ -134,18 +136,27 @@ $(eval undefine	plugin_dir_abs)
 )
 endef
 
-ifneq ($(flexo.plugins),)
-$(call flexo.error,flexo.plugins already set [$(flexo.plugins)]. This is not expected)
+flexo.plugins = $(error ERROR: flexo.plugins is poisoned)
+
+ifneq ($(flexo.plugins_discovered),)
+$(call flexo.error,flexo.plugins_discovered already set [$(flexo.plugins_discovered)]. This is not expected)
 endif
-flexo.plugins :=
+flexo.plugins_discovered :=
 $(call flexo.discover,$(flexo.plugins_dir))
 
-$(call flexo.debug,Available Plugins: $(flexo.plugins))
+$(call flexo.debug,Available Plugins: $(flexo.plugins_discovered))
 
 define flexo.assert_is_plugin
 $(strip \
-$(if $(filter $1,$(flexo.plugins)),,\
-	$(call flexo.error,Plugin '$1' not found. Available plugins: $(flexo.plugins)))
+$(if $(filter $1,$(flexo.plugins_discovered)),,\
+	$(call flexo.error,Plugin '$1' not found. Available plugins: $(flexo.plugins_discovered)))
+)
+endef
+
+define flexo.assert_plugin_is_not_already_loading
+$(strip \
+$(if $(filter $1,$(flexo.plugins_loading)),\
+	$(call flexo.error,Plugin '$1' is already loading. Circular dependency detected: $(subst $(SPACE),-->,$(flexo.plugins_loading))-->$1))
 )
 endef
 
@@ -158,9 +169,6 @@ $(if $(wildcard $(flexo.$1.mk)),,$(call flexo.error,Plugin '$1' makefile not fou
 $(flexo.$1.mk)
 )
 endef
-
-# need to cheat and preload the builtins stack plugin because it is used by the plugin loader
-#include $(flexo.root_dir)/plugins/builtins/flexo.mk
 
 flexo.illegal_variables = \
 	$(filter-out \
@@ -177,30 +185,32 @@ define flexo.illegal_variables_checker
 $(strip \
 $(if $1,,$(call flexo.error,ARG1 [plugin_name] not specified for function $0))
 $(if $(flexo.illegal_variables),\
-	$(call flexo.error,Flexo Plugin '$(1)' defined illegal variables: $(flexo.illegal_variables)),\
-	$(call flexo.debug,Flexo Plugin '$(1)' loaded successfully)\
+	$(call flexo.error,Flexo Plugin '$(1)' defined illegal variables: $(flexo.illegal_variables))\
 ))
 endef
 
-# ToDo: Be sure not to load it twice
 define flexo.add
 $(strip \
 $(flexo.debug.call)
 $(if $1,,$(call flexo.error,ARG1 [plugin_name] not specified for function $0))
-$(flexo.assert_is_plugin,$1)
-$(eval FLEXO.VARIABLES.$1 := $(.VARIABLES))
-$(eval include $(call flexo.makefile,$1))
-$(call flexo.illegal_variables_checker,$1)
-$(eval undefine FLEXO.VARIABLES.$1)
-$(eval flexo.plugins_loaded += $1)
-)
+$(call flexo.assert_is_plugin,$1)
+$(call flexo.assert_plugin_is_not_already_loading,$1)
+$(if $(filter $1,$(flexo.plugins_loaded)),\
+	$(call flexo.debug,Plugin '$1' already loaded. Skipping...),
+	$(eval FLEXO.PLUGINS_LOADING.$1 := $(flexo.plugins_loading))
+		$(eval flexo.plugins_loading += $1)
+		$(eval FLEXO.VARIABLES.$1 := $(.VARIABLES))
+		$(eval include $(call flexo.makefile,$1))
+		$(call flexo.illegal_variables_checker,$1)
+		$(call flexo.debug,Flexo Plugin '$1' loaded successfully)
+		$(eval undefine FLEXO.VARIABLES.$1)
+		$(eval flexo.plugins_loading := $(FLEXO.PLUGINS_LOADING.$1))
+		$(eval undefine FLEXO.PLUGINS_LOADING.$1)
+		$(eval flexo.plugins_loaded += $1)
+))
 endef
 
 $(call flexo.add,builtins)
-
-# move this into builtin0s if you can
-#$(call flexo.add,stack)
-
 
 ############################
 # unset the "Static" scope variables and do some checking and double checking
