@@ -5,6 +5,7 @@ recursive_make.targets ?= all
 recursive_make.subdirs ?=
 
 define recursive_make.generate
+$(flexo.debug.call)
 $(foreach target,$(recursive_make.targets),
 	$(eval .PHONY: $(target))
 	$(foreach subdir,$(recursive_make.subdirs),
@@ -13,7 +14,7 @@ $(foreach target,$(recursive_make.targets),
 		$(eval \
 		$(target)-$(subdir):
 			$(MAKE) -C $(subdir) $(target)
-		) 
+		)
 	)
 )
 endef

@@ -10,3 +10,5 @@ $(call flexo.add,formatter)
 
 .PHONY: all
 all: git.status
+
+$(flexo.generate)

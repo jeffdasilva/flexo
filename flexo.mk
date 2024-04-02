@@ -216,9 +216,13 @@ define flexo.generate
 $(strip \
 $(flexo.debug.call)
 $(foreach plugin,$(flexo.plugins_loaded),$(call $(plugin).generate))
+$(eval flexo.generate_function_not_called_yet :=)
 )
 endef
 
+all: $$(flexo.generate_function_not_called_yet)
+flexo.generate_function_not_called_yet = $(call flexo.error,flexo.generate function not called. \
+Don't forget to add "$$(flexo.generate)" to the end your flexo Makefile)
 
 ############################
 # unset the "Static" scope variables and do some checking and double checking
