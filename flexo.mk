@@ -212,6 +212,14 @@ endef
 
 $(call flexo.add,builtins)
 
+define flexo.generate
+$(strip \
+$(flexo.debug.call)
+$(foreach plugin,$(flexo.plugins_loaded),$(call $(plugin).generate))
+)
+endef
+
+
 ############################
 # unset the "Static" scope variables and do some checking and double checking
 undefine flexo.plugins_dir
