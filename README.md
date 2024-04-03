@@ -1,5 +1,6 @@
-# Flexo
-Flexo simplifies project setup with reusable GNU Makefile fragments for different languages, libraries, and frameworks, eliminating redundant code. Boost productivity and ensure consistency across projects effortlessly.
+# Flexo MK
+
+The choose your own adventure build system
 
 # Getting Started
 
