@@ -1,6 +1,6 @@
 
 
-formatter.files ?= $(git.ls-files)
+formatter.files ?= $(wildcard $(git.ls-files))
 
 .PHONY: formatter.remove-trailing-whitespace
 formatter.remove-trailing-whitespace: $(patsubst %,%.formatter.remove-trailing-whitespace,$(formatter.files))
