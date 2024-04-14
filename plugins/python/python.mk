@@ -16,6 +16,11 @@ endif
 ifneq ($(VIRTUAL_ENV),)
 venv:
 	$(error ERROR: "$@" target not available from within a venv virtual environment. Maybe you want 'make venv_local' instead?)
+
+.PHONY: venv_local
+venv_local:
+	$(MAKE) VENV_DIR= VENV_SETUP= VIRTUAL_ENV= venv
+
 else
 venv: requirements.txt
 	$(if $(python.venv.dir),$(if $(wildcard $(python.venv.dir)),,$(python.exe) -m venv $(python.venv.dir)))
@@ -31,6 +36,11 @@ python.test:
 .PHONY: python.pytest
 python.pytest:
 	$(python.venv.setup) $(python.exe) -m pytest -v
+
+
+.PHONY: python.black
+python.black:
+	$(python.venv.setup) black .
 
 .PHONY: pytest
 pytest: python.pytest
