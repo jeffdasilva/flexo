@@ -37,10 +37,18 @@ python.test:
 python.pytest:
 	$(python.venv.setup) $(python.exe) -m pytest -v
 
+.PHONY: pytest
+pytest: python.pytest
 
 .PHONY: python.black
 python.black:
 	$(python.venv.setup) black .
 
-.PHONY: pytest
-pytest: python.pytest
+
+python.mypy.options += --strict
+#python.mypy.options += --ignore-missing-imports
+
+.PHONY: python.mypy
+python.mypy:
+	$(python.venv.setup) mypy $(python.mypy.options) .
+
