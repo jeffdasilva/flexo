@@ -9,6 +9,9 @@ git.path = $(git.toplevel)
 $(call flexo.add,formatter)
 $(call flexo.add,help)
 
+$(call flexo.add,clean)
+clean.directories += work
+
 all.help = Runs 'git status'
 .PHONY: all
 all: git.status

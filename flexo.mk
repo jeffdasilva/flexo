@@ -28,6 +28,8 @@ flexo.root_dir := $(patsubst %/,%,$(dir $(flexo.root.mk)))
 FLEXO.GLOBAL_VARIABLES := \
 	FLEXO.DEBUG FLEXO.VERBOSE \
 	QUIET COMMA empty SPACE tolower toupper \
+	MKDIR RM
+
 #
 # "Static" scoped variables that will be undefined befere this makefile exists
 flexo.plugins_dir := $(flexo.root_dir)/plugins
@@ -42,6 +44,9 @@ FLEXO.VARIABLES.flexo := $(.VARIABLES)
 .SECONDEXPANSION:
 
 SHELL := /bin/bash
+
+MKDIR := mkdir -p
+RM := rm -f
 
 override empty :=
 override SPACE := $(empty) $(empty)
