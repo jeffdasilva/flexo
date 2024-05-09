@@ -28,6 +28,13 @@ git.stage-diff:
 git.reset-to-last-commit:
 	$(git.cmd) reset HEAD .
 
+.PHONY: git.lazy-commit git.lazy
+git.lazy-commit git.lazy:
+	$(if $(COMMIT_MSG),,$(info INFO: If you want lazier do: '$(MAKE) $@ COMMIT_MSG="..."'))
+	$(git.cmd) add .
+	$(git.cmd) commit $(if $(COMMIT_MSG),-am "$(COMMIT_MSG)",-a)
+	$(git.cmd) push
+
 .PHONY: sync
 sync: git.pull
 
