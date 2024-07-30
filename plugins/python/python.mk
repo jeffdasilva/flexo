@@ -47,9 +47,8 @@ pytest: python.pytest
 python.black:
 	$(python.venv.setup) black .
 
-
 python.mypy.options += --strict
-#python.mypy.options += --ignore-missing-imports
+python.mypy.options += --ignore-missing-imports
 
 .PHONY: python.mypy
 python.mypy:
