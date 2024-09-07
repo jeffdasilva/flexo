@@ -31,7 +31,7 @@ FLEXO.GLOBAL_VARIABLES := \
 	MKDIR RM
 
 #
-# "Static" scoped variables that will be undefined befere this makefile exists
+# "Static" scoped variables that will be undefined befere this makefile exits
 flexo.plugins_dir := $(flexo.root_dir)/plugins
 FLEXO.MAKECMDGOALS := $(filter flexo.%,$(MAKECMDGOALS))
 FLEXO.VARIABLES.flexo := $(.VARIABLES)
