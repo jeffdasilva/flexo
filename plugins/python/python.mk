@@ -36,6 +36,7 @@ endif
 python.test:
 	$(python.venv.setup) $(python.exe) -m unittest discover -v $(python.test.dir)
 
+python.required_packages += pytest
 .PHONY: python.pytest
 python.pytest:
 	$(python.venv.setup) $(python.exe) -m pytest -v
@@ -43,10 +44,12 @@ python.pytest:
 .PHONY: pytest
 pytest: python.pytest
 
+python.required_packages += black
 .PHONY: python.black
 python.black:
 	$(python.venv.setup) black .
 
+python.required_packages += mypy
 python.mypy.options += --strict
 python.mypy.options += --ignore-missing-imports
 
@@ -54,3 +57,20 @@ python.mypy.options += --ignore-missing-imports
 python.mypy:
 	$(python.venv.setup) mypy $(python.mypy.options) .
 
+
+.PHONY: python.init
+python.init: python.init.requirements
+
+
+
+.PHONY: python.init.requirements
+python.init.requirements:
+	$(if $(wildcard requirements.txt),,$(strip \
+		$(file >requirements.txt)\
+		$(foreach package,$(sort $(python.required_packages)),$(file >>requirements.txt,$(package)))\
+		$(info INFO: Created requirements.txt)\
+		@true \
+	))
+
+.PHONY: init
+init: python.init

@@ -212,6 +212,7 @@ $(if $(filter $1,$(flexo.plugins_loaded)),\
 		$(eval flexo.plugins_loading := $(FLEXO.PLUGINS_LOADING.$1))
 		$(eval undefine FLEXO.PLUGINS_LOADING.$1)
 		$(eval flexo.plugins_loaded += $1)
+		$(eval $1.enabled := T)
 ))
 endef
 
