@@ -58,10 +58,13 @@ python.mypy:
 	$(python.venv.setup) mypy $(python.mypy.options) .
 
 
+python.required_packages += $(if $(ollama.enabled),ollama langchain langchain_ollama)
+python.required_packages += $(if $(selenium.enabled),selenium)
+
+
+init: python.init
 .PHONY: python.init
 python.init: python.init.requirements
-
-
 
 .PHONY: python.init.requirements
 python.init.requirements:
@@ -72,5 +75,8 @@ python.init.requirements:
 		@true \
 	))
 
-.PHONY: init
-init: python.init
+install: python.install
+.PHONY: python.install
+python.install:
+	$(if $(or $(filter $@,$(MAKECMDGOALS)),$(call do_not_have_exe,$(python.exe))),\
+		sudo apt -y install python3 python3-venv python3-pip)

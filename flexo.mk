@@ -27,7 +27,7 @@ flexo.root_dir := $(patsubst %/,%,$(dir $(flexo.root.mk)))
 # Allowed global scoped variables
 FLEXO.GLOBAL_VARIABLES := \
 	FLEXO.DEBUG FLEXO.VERBOSE \
-	QUIET COMMA empty SPACE tolower toupper \
+	QUIET COMMA empty SPACE tolower toupper have_exe do_not_have_exe \
 	MKDIR RM
 
 #
@@ -60,12 +60,29 @@ define toupper
 $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f,F,$(subst g,G,$(subst h,H,$(subst i,I,$(subst j,J,$(subst k,K,$(subst l,L,$(subst m,M,$(subst n,N,$(subst o,O,$(subst p,P,$(subst q,Q,$(subst r,R,$(subst s,S,$(subst t,T,$(subst u,U,$(subst v,V,$(subst w,W,$(subst x,X,$(subst y,Y,$(subst z,Z,$1))))))))))))))))))))))))))
 endef
 
+define have_exe
+$(if $(or $(wildcard $1),$(shell which $1 2>/dev/null)),T)
+endef
+
+define do_not_have_exe
+$(if $(call have_exe,$1),,T)
+endef
+
 # If you don't already have a default target then "all" will be the default target
 .PHONY: all
 all:
 
+# clean up
 .PHONY: clean
 clean:
+
+# initialize a new project
+.PHONY: init
+init:
+
+# install required packages (external OS dependencies)
+.PHONY: install
+install:
 
 ###############################################################################
 
