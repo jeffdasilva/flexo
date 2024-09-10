@@ -1,4 +1,6 @@
 
+python.flexo.root_dir := $(abspath $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST)))))
+$(call flexo.discover,$(python.flexo.root_dir))
 
 python.exe = python3
 python.pip.exe = $(python.exe) -m pip

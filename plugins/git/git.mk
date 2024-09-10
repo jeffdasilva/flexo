@@ -45,7 +45,6 @@ diff: git.diff
 .PHONY: revert
 revert: git.reset-to-last-commit
 
-.PHONY: init
 init: $(filter git.init,$(git.ALIAS_TARGETS))
 
 init: git.init.gitignore
@@ -67,3 +66,10 @@ git.init.gitignore:
 	$(if $(wildcard $(git.gitignore_file)),,\
 		$(if $(git.gitignore.template_url),\
 			wget $(git.gitignore.template_url) -O $(git.gitignore_file)))
+
+
+install: git.install
+
+.PHONY: git.install
+git.install:
+	$(if $(or $(filter $@,$(MAKECMDGOALS)),$(call do_not_have_exe,$(git.exe))),sudo apt install -y git)

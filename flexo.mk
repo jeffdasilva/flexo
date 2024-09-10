@@ -72,7 +72,7 @@ endef
 .PHONY: all
 all:
 
-# clean up
+# clean up temporary work/files
 .PHONY: clean
 clean:
 
@@ -80,7 +80,7 @@ clean:
 .PHONY: init
 init:
 
-# install required packages (external OS dependencies)
+# install required packages (i.e. install external OS dependencies)
 .PHONY: install
 install:
 

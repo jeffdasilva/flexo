@@ -5,7 +5,10 @@
 # https://github.com/ollama/ollama/blob/main/docs/linux.md
 
 ollama.exe ?= ollama
+
 ollama.model ?= llama3.1
+#ollama.model ?= llama3.1:70b
+#ollama.model ?= mistral
 
 .PHONY: ollama.run
 ollama.run:
