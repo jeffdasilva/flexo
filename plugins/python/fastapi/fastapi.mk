@@ -1,4 +1,4 @@
-# https://streamlit.io/
+# https://fastapi.tiangolo.com/
 
 python.required_packages += fastapi[standard]
 
@@ -12,7 +12,7 @@ fastapi.cmd = $(fastapi.exe) $(fastapi.subcmd) $(fastapi.main) $(if $(fastapi.po
 fastapi.dev fastapi.run: fastapi.%:
 	$(python.venv.setup) $(fastapi.cmd)
 
-install: streamlit.install
+install: fastapi.install
 
 .PHONY: fastapi.install
 fastapi.install: python.install python.install.venv
