@@ -21,6 +21,10 @@ $(git.ALIAS_TARGETS): git.%:
 git.stage:
 	$(git.cmd) add .
 
+.PHONY: git.unstage git.restore
+git.unstage git.restore:
+	$(git.cmd) restore .
+
 .PHONY: git.stage-diff
 git.stage-diff:
 	$(git.cmd) diff --cached
@@ -43,7 +47,7 @@ sync: git.pull
 diff: git.diff
 
 .PHONY: revert
-revert: git.reset-to-last-commit
+revert: git.reset-to-last-commit git.unstage
 
 init: $(filter git.init,$(git.ALIAS_TARGETS))
 
