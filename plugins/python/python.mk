@@ -2,7 +2,7 @@
 python.flexo.root_dir := $(abspath $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST)))))
 $(call flexo.discover,$(python.flexo.root_dir))
 
-python.exe = python3
+python.exe ?= python3
 python.pip.exe = $(python.exe) -m pip
 python.test.dir ?= .
 
@@ -41,7 +41,7 @@ python.test:
 python.required_packages += pytest
 .PHONY: python.pytest
 python.pytest:
-	$(python.venv.setup) $(python.exe) -m pytest -v
+	$(python.venv.setup) $(python.exe) -m pytest -v -s
 
 .PHONY: pytest
 pytest: python.pytest
