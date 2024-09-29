@@ -4,16 +4,12 @@ uvicorn.python_packages = uvicorn uvicorn-worker gunicorn
 python.required_packages += $(uvicorn.python_packages)
 
 uvicorn.exe ?= uvicorn
-uvicorn.app_dir ?= app
+#uvicorn.app_dir ?= app
 uvicorn.main ?= main:app
 
 .PHONY: uvicorn.run
 uvicorn.run:
 	$(python.venv.setup) $(uvicorn.exe) $(uvicorn.main) --reload $(if $(uvicorn.app_dir),--app-dir=$(uvicorn.app_dir))
-
-.PHONY: gunicorn.run
-gunicorn.run:
-	gunicorn $(uvicorn.main) -w 4 -k uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000
 
 .PHONY: uvicorn.install
 uvicorn.install: python.install python.install.venv
