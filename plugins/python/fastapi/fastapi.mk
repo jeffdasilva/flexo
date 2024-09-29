@@ -6,7 +6,8 @@ fastapi.exe ?= fastapi
 fastapi.main ?= main.py
 fastapi.port ?= 8000
 fastapi.subcmd ?= $(if $(filter run dev,$*),$*,run)
-fastapi.cmd = $(fastapi.exe) $(fastapi.subcmd) $(fastapi.main) $(if $(fastapi.port),--port 8000)
+fastapi.args += $(if $(fastapi.port),--port 8000)
+fastapi.cmd = $(fastapi.exe) $(fastapi.subcmd) $(fastapi.main) $(fastapi.args)
 
 .PHONY: fastapi.dev fastapi.run
 fastapi.dev fastapi.run: fastapi.%:

@@ -7,9 +7,17 @@ uvicorn.exe ?= uvicorn
 #uvicorn.app_dir ?= app
 uvicorn.main ?= main:app
 
+uvicorn.log_conf ?= log_conf.yaml
+uvicorn.args += $(if $(wildcard $(uvicorn.log_conf)),--log-config $(uvicorn.log_conf))
+#uvicorn.args += --log-level info
+
+uvicorn.args += --reload
+
+uvicorn.args += $(if $(uvicorn.app_dir),--app-dir=$(uvicorn.app_dir))
+
 .PHONY: uvicorn.run
 uvicorn.run:
-	$(python.venv.setup) $(uvicorn.exe) $(uvicorn.main) --reload $(if $(uvicorn.app_dir),--app-dir=$(uvicorn.app_dir))
+	$(python.venv.setup) $(uvicorn.exe) $(uvicorn.main) $(uvicorn.args)
 
 .PHONY: uvicorn.install
 uvicorn.install: python.install python.install.venv
