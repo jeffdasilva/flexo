@@ -11,6 +11,12 @@ uvicorn.log_conf ?= log_conf.yaml
 uvicorn.args += $(if $(wildcard $(uvicorn.log_conf)),--log-config $(uvicorn.log_conf))
 #uvicorn.args += --log-level info
 
+uvicorn.host ?= 0.0.0.0
+uvicorn.port ?= 8000
+
+uvicorn.args += $(if $(uvicorn.host),--host=$(uvicorn.host))
+uvicorn.args += $(if $(uvicorn.port),--port=$(uvicorn.port))
+
 uvicorn.args += --reload
 
 uvicorn.args += $(if $(uvicorn.app_dir),--app-dir=$(uvicorn.app_dir))
