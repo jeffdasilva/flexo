@@ -17,7 +17,8 @@ uvicorn.port ?= 8000
 uvicorn.args += $(if $(uvicorn.host),--host=$(uvicorn.host))
 uvicorn.args += $(if $(uvicorn.port),--port=$(uvicorn.port))
 
-uvicorn.args += --reload
+uvicorn.reload ?= $(or $(reload),$(RELOAD))
+uvicorn.args += $(if $(call flexo.true,$(uvicorn.reload)),--reload $(patsubst %,--reload-exclude=%,$(uvicorn.reload_exclude)))
 
 uvicorn.args += $(if $(uvicorn.app_dir),--app-dir=$(uvicorn.app_dir))
 
