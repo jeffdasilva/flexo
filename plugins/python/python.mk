@@ -7,10 +7,9 @@ python.pip.exe = $(python.exe) -m pip
 python.test.dir ?= .
 
 python.venv.dir = .venv
+python.venv.activate = $(python.venv.dir)/bin/activate
 
 ifeq ($(VIRTUAL_ENV),)
-
-python.venv.activate = $(python.venv.dir)/bin/activate
 
 python.venv.setup = $(strip $(if $(or $(wildcard $(python.venv.activate)),$(filter venv,$@ $(MAKECMDGOALS))),\
         source $(python.venv.dir)/bin/activate && ,\
@@ -22,26 +21,46 @@ ifneq ($(VIRTUAL_ENV),)
 venv:
 	$(error ERROR: "$@" target not available from within a venv virtual environment. Maybe you want 'make venv_local' instead?)
 
+python.venv_update_target = venv_local
+
 .PHONY: venv_local
 venv_local:
 	$(MAKE) VENV_DIR= VENV_SETUP= VIRTUAL_ENV= venv
 
 else
+
+python.venv_update_target = venv
+
 venv: requirements.txt
 	$(if $(python.venv.dir),$(if $(wildcard $(python.venv.activate)),,$(python.exe) -m venv $(python.venv.dir)))
 	$(python.venv.setup) $(python.pip.exe) install --upgrade pip
 	$(python.venv.setup) $(python.pip.exe) install -r $<
 	$(python.venv.setup) $(python.pip.exe) list
+
+endif
+
+ifneq ($(python.venv.activate),)
+ifneq ($(python.venv_update_target),)
+$(python.venv.activate): requirements.txt
+	$(MAKE) $(python.venv_update_target) python.venv_update_target=
+	@[ -f $@ ]
+	@touch $@
+endif
 endif
 
 .PHONY: python.test
 python.test:
 	$(python.venv.setup) $(python.exe) -m unittest discover -v $(python.test.dir)
 
-python.required_packages += pytest
+python.required_packages += pytest pytest-asyncio
+python.required_packages += $(if $(call flexo.true,$(pytest.testmon.enabled)),pytest-testmon)
+
+python.pytest.options += -v -s
+python.pytest.options += $(if $(call flexo.true,$(pytest.testmon.enabled)),--testmon)
+
 .PHONY: python.pytest
-python.pytest:
-	$(python.venv.setup) $(python.exe) -m pytest -v -s
+python.pytest: $(python.venv.activate)
+	$(python.venv.setup) $(python.exe) -m pytest $(python.pytest.options)
 
 .PHONY: pytest
 pytest: python.pytest
@@ -60,8 +79,8 @@ python.mypy:
 	$(python.venv.setup) mypy $(python.mypy.options) .
 
 
-python.required_packages += $(if $(ollama.enabled),ollama langchain langchain_ollama)
-python.required_packages += $(if $(selenium.enabled),selenium)
+python.required_packages += $(if $(call flexo.true,$(ollama.enabled)),ollama langchain langchain_ollama)
+python.required_packages += $(if $(call flexo.true,$(selenium.enabled)),selenium)
 
 
 init: python.init
