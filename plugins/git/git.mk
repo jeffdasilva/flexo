@@ -40,6 +40,19 @@ git.lazy-commit git.lazy:
 	$(git.cmd) commit $(if $(COMMIT_MSG),-am "$(COMMIT_MSG)",-a)
 	$(git.cmd) push
 
+.PHONY: git.info
+git.info:
+	@echo ======================================
+	$(git.cmd) remote -v 
+	@echo ======================================
+	$(git.cmd) branch --list -r
+	@echo ======================================
+	$(git.cmd) log --oneline --graph --decorate --all -3
+	@echo ======================================
+	$(git.cmd) status
+	@echo ======================================
+
+
 .PHONY: sync
 sync: git.pull
 
