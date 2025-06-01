@@ -6,8 +6,26 @@ python.exe ?= python3
 python.pip.exe = $(python.exe) -m pip
 python.test.dir ?= .
 
+python.uv.enable ?= F
+
 python.venv.dir = .venv
 python.venv.activate = $(python.venv.dir)/bin/activate
+
+
+
+ifneq ($(call flexo.true,$(python.uv.enable)),)
+
+###############################################################################
+# THE NEW UV Python Makefile way
+$(call flexo.add,uv)
+
+
+###############################################################################
+
+else # if we are not using uv (old style)
+
+###############################################################################
+# THE OLD Non-UV Python Makefile way
 
 ifeq ($(VIRTUAL_ENV),)
 
@@ -111,3 +129,7 @@ python.install.venv:
 endif
 
 install: python.install python.install.venv
+
+###############################################################################
+
+endif # python.uv.enable == TRUE

@@ -72,6 +72,18 @@ endef
 .PHONY: all
 all:
 
+# Run your tests
+.PHONY: test
+test:
+
+# Format/lint your code
+.PHONY: format
+format:
+
+# Static Analysis to check your code for problems or errors
+.PHONY: check
+check:
+
 # clean up temporary work/files
 .PHONY: clean
 clean:
