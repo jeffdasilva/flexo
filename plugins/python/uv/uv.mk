@@ -33,8 +33,10 @@ init: uv.init uv.lock
 uv.init:
 	uv init
 
+ifeq ($(filter uv.lock,$(MAKECMDGOALS)),uv.lock)
 .PHONY: uv.lock
-uv.lock: $(if $(wildcard pyproject.toml),,uv.init)
+endif
+uv.lock: $(if $(wildcard pyproject.toml),pyproject.toml,uv.init)
 	uv lock
 
 .PHONY: uv.sync
