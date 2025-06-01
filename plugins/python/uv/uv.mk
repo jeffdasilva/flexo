@@ -5,6 +5,7 @@
 uv.exe := uv
 uv.uvx.exe := uvx
 
+uv.run.entrypoint ?= $(firstword $(wildcard main.py) $(wildcard *main.py))
 
 ###############################################################################
 
@@ -31,23 +32,37 @@ init: uv.init uv.lock
 
 .PHONY: uv.init
 uv.init:
-	uv init
+	$(uv.exe) init
 
 ifeq ($(filter uv.lock,$(MAKECMDGOALS)),uv.lock)
 .PHONY: uv.lock
 endif
 uv.lock: $(if $(wildcard pyproject.toml),pyproject.toml,uv.init)
-	uv lock
+	$(uv.exe) lock
 
 .PHONY: uv.sync
 uv.sync:
-	uv sync
+	$(uv.exe) sync
 
 .PHONY: uv.venv
 uv.venv:
-	uv venv
+	$(uv.exe) venv
 
 ###############################################################################
+
+
+###############################################################################
+
+run: uv.run
+.PHONY: uv.run
+
+uv.run: $(uv.run.entrypoint)
+	$(uv.exe) run $<
+
+###############################################################################
+
+
+
 
 
 ###############################################################################
