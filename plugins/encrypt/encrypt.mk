@@ -1,6 +1,6 @@
 
 
-#encrypt.files = 
+#encrypt.files =
 encrypt.files_enc = $(addsuffix .enc,$(encrypt.files))
 
 .PHONY: decrypt

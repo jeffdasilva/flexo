@@ -43,7 +43,7 @@ git.lazy-commit git.lazy:
 .PHONY: git.info
 git.info:
 	@echo ======================================
-	$(git.cmd) remote -v 
+	$(git.cmd) remote -v
 	@echo ======================================
 	$(git.cmd) branch --list -r
 	@echo ======================================
