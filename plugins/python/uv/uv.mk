@@ -96,7 +96,7 @@ uv.format: uv.ruff.format
 
 .PHONY: uv.ruff.format
 uv.ruff.format:
-	$(uvx.exe) ruff format
+	$(uv.uvx.exe) ruff format
 
 .PHONY: ruff
 ruff: uv.ruff
@@ -116,11 +116,11 @@ uv.check: uv.ruff.check uv.mypy.check
 
 .PHONY: uv.ruff.check
 uv.ruff.check:
-	$(uvx.exe) ruff check
+	$(uv.uvx.exe) ruff check
 
 .PHONY: uv.mypy.check
 uv.mypy.check:
-	$(uvx.exe) mypy --strict --ignore-missing-imports --show-error-code-links .
+	$(uv.uvx.exe) mypy --strict --ignore-missing-imports --show-error-code-links .
 
 .PHONY: mypy
 mypy: uv.mypy
