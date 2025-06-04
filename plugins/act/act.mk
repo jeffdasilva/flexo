@@ -7,7 +7,8 @@ act.installed = $(or $(call have_exe,$(act.exe)),$(wildcard $(act.exe)))
 ####################################################################
 # Locally run github actions with act
 
-install: act.install
+# Don't install by default so that normal CI builds don't require Docker.
+#install: act.install
 
 .PHONY: act.install
 act.install:
@@ -23,4 +24,5 @@ endif
 .PHONY: act
 act: $(if $(act.installed),,act.install)
 	$(act.exe)
+
 ####################################################################
