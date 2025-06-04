@@ -14,7 +14,7 @@ install: uv.install uv.install.tools
 # https://github.com/astral-sh/uv
 .PHONY: uv.install
 uv.install:
-	$(if $(or $(filter install $@,$(MAKECMDGOALS)),$(call do_not_have_exe,$(uv.exe))),\
+	$(if $(or $(filter $@,$(MAKECMDGOALS)),$(call do_not_have_exe,$(uv.exe))),\
 		@echo "Installing uv..."; curl -LsSf https://astral.sh/uv/install.sh | sh)
 
 
