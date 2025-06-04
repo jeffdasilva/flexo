@@ -20,10 +20,11 @@ uv.install:
 
 uv.tools.packages = \
 	ruff \
-	mypy \
-	pytest
+	mypy
 
+# I think these should be installed as normal python packages and not as uv tools.
 #uv.tools.packages += \
+#   pytest \
 #	pytest-asyncio \
 #	$(if $(call flexo.true,$(pytest.testmon.enabled)),pytest-testmon)
 
@@ -136,7 +137,7 @@ test: uv.pytest
 
 .PHONY: uv.pytest
 uv.pytest:
-	$(uvx.exe) pytest -v -s $(if $(call flexo.true,$(pytest.testmon.enabled)),--testmon)
+	$(uv.exe) run pytest -v -s $(if $(call flexo.true,$(pytest.testmon.enabled)),--testmon)
 
 .PHONY: pytest
 pytest: uv.pytest
