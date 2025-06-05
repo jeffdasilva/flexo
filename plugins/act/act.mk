@@ -18,7 +18,8 @@ ifeq ($(act.installed),)
 	docker info
 	docker run hello-world
 	@echo "Installing act..."
-	curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+	mkdir -p $(dir $(act.exe))
+	curl https://raw.githubusercontent.com/nektos/act/master/install.sh | bash
 endif
 
 .PHONY: act

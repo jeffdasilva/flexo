@@ -9,7 +9,9 @@ uv.run.entrypoint ?= $(firstword $(wildcard main.py) $(wildcard *main.py))
 
 ###############################################################################
 
-install: uv.install uv.install.tools
+install: uv.install
+
+#install: uv.install.tools
 
 # https://github.com/astral-sh/uv
 .PHONY: uv.install
