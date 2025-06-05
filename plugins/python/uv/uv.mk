@@ -130,6 +130,28 @@ uv.mypy: uv.mypy.check
 
 ###############################################################################
 
+###############################################################################
+# Linting
+
+.PHONY: lint
+lint: uv.lint
+
+.PHONY: uv.lint
+uv.lint: uv.pylint
+
+uv.pylint.targets = $(patsubst %,uv-pylint-%,$(pylint.files))
+
+.PHONY: uv.pylint
+uv.pylint: $(uv.pylint.targets)
+
+.PHONY: $(uv.pylint.targets)
+$(uv.pylint.targets): uv-pylint-%: %
+	$(uv.uvx.exe) pylint --disable=import-error --logging-format-style=new --disable=logging-fstring-interpolation $<
+
+
+###############################################################################
+
+
 
 ###############################################################################
 
