@@ -6,7 +6,7 @@
 # webdirver-manager doesn't work with wsl. These instructions seem to do the trick:
 # https://cloudbytes.dev/snippets/run-selenium-and-chrome-on-wsl2
 # substitute "libasound2t64 libasound2-plugins" instead of "libasound2"
-
+# unfortunately, this install method doesn't work with 'act' under wsl2
 
 #selenium.chrome.exe = google-chrome
 selenium.chrome.exe = bin/chrome-linux64/chrome
@@ -26,10 +26,12 @@ selenium.install: selenium.chrome.install
 .PHONY: selenium.chrome.install
 selenium.chrome.install:
 ifeq ($(selenium.chrome.exe),google-chrome)
+
 	$(if $(or $(filter $@,$(MAKECMDGOALS)),$(call do_not_have_exe,$(selenium.chrome.exe))),\
 		wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O google-chrome-stable_current_amd64.deb && \
 		sudo apt -y install ./google-chrome-stable_current_amd64.deb && \
 		rm ./google-chrome-stable_current_amd64.deb)
+
 else # if $(selenium.chrome.exe) is not google-chrome
 
 ifeq ($(selenium.chrome.installed),)
@@ -42,14 +44,14 @@ ifeq ($(selenium.chrome.installed),)
 	rm -f chrome-linux64.zip*
 	wget $(call selenium.chrome.latest_url,chrome)
 
-#	@echo "[$@] Install Chrome dependencies..."
-#	sudo apt install -y ca-certificates fonts-liberation \
-#    	libappindicator3-1 libasound2t64 libasound2-plugins libatk-bridge2.0-0 libatk1.0-0 libc6 \
-#    	libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgbm1 \
-#    	libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 \
-#    	libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 \
-#    	libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 \
-#    	libxrandr2 libxrender1 libxss1 libxtst6 lsb-release wget xdg-utils
+	@echo "[$@] Install Chrome dependencies..."
+	sudo apt install -y ca-certificates fonts-liberation \
+    	libappindicator3-1 libasound2t64 libasound2-plugins libatk-bridge2.0-0 libatk1.0-0 libc6 \
+    	libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgbm1 \
+    	libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 \
+    	libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 \
+    	libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 \
+    	libxrandr2 libxrender1 libxss1 libxtst6 lsb-release wget xdg-utils
 
 	mkdir -p bin
 	unzip -o chrome-linux64.zip -d bin
@@ -64,16 +66,6 @@ selenium.CHROME_VERSION = $(or $(lastword $(shell $(selenium.chrome.exe) --versi
 selenium.install: selenium.chromedriver.install
 .PHONY: selenium.chromedriver.install
 selenium.chromedriver.install: selenium.chrome.install
-
-# ifneq ($(or $(filter selenium.chromedriver.install,$(MAKECMDGOALS)),$(call do_not_have_exe,$(selenium.chromedriver.exe))),)
-# selenium.chromedriver.install:
-# 	@rm -rf chromedriver-linux64 chromedriver-linux64.zip
-# 	wget https://storage.googleapis.com/chrome-for-testing-public/$(selenium.CHROME_VERSION)/linux64/chromedriver-linux64.zip -O chromedriver-linux64.zip
-# 	unzip chromedriver-linux64.zip
-# 	@mkdir -p $(dir $(selenium.chromedriver.exe))
-# 	cp -f chromedriver-linux64/chromedriver $(selenium.chromedriver.exe)
-# 	@rm -rf chromedriver-linux64 chromedriver-linux64.zip
-# endif
 
 selenium.chromedriver.install:
 ifeq ($(selenium.chromedriver.installed),)

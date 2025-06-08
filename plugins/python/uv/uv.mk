@@ -122,13 +122,17 @@ uv.ruff.check:
 
 .PHONY: uv.mypy.check
 uv.mypy.check:
-	$(uv.uvx.exe) mypy --strict --ignore-missing-imports --show-error-code-links .
+	$(uv.uvx.exe) mypy --pretty --strict --ignore-missing-imports --show-error-code-links .
 
 .PHONY: mypy
 mypy: uv.mypy
 
 .PHONY: uv.mypy
 uv.mypy: uv.mypy.check
+
+.PHONY: uv.ty
+uv.ty:
+	$(uv.uvx.exe) ty check
 
 ###############################################################################
 
@@ -146,9 +150,17 @@ uv.pylint.targets = $(patsubst %,uv-pylint-%,$(pylint.files))
 .PHONY: uv.pylint
 uv.pylint: $(uv.pylint.targets)
 
+uv.pylint.args += \
+	$(pylint.args) \
+	--output-format=colorized \
+	--disable=import-error \
+	--logging-format-style=new \
+	--disable=logging-fstring-interpolation \
+	--disable=global-statement
+
 .PHONY: $(uv.pylint.targets)
 $(uv.pylint.targets): uv-pylint-%: %
-	$(uv.uvx.exe) pylint --disable=import-error --logging-format-style=new --disable=logging-fstring-interpolation $<
+	$(uv.uvx.exe) pylint $(uv.pylint.args) $<
 
 
 ###############################################################################
