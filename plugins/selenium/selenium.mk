@@ -44,8 +44,9 @@ ifeq ($(selenium.chrome.installed),)
 	rm -f chrome-linux64.zip*
 	wget $(call selenium.chrome.latest_url,chrome)
 
-	@echo "[$@] Install Chrome dependencies..."
-	sudo apt install -y ca-certificates fonts-liberation \
+# This only works with wsl2, and not with 'act' under wsl2. (leave disabled for now)
+#	@echo "[$@] Install Chrome dependencies..."
+#	sudo apt install -y ca-certificates fonts-liberation \
     	libappindicator3-1 libasound2t64 libasound2-plugins libatk-bridge2.0-0 libatk1.0-0 libc6 \
     	libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgbm1 \
     	libgcc1 libglib2.0-0 libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 \

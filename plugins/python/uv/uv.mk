@@ -106,6 +106,18 @@ ruff: uv.ruff
 .PHONY: uv.ruff
 uv.ruff: uv.ruff.format
 
+format: uv.isort.format
+
+.PHONY: uv.isort.format
+uv.isort.format:
+	$(uv.uvx.exe) isort .
+
+.PHONY: isort
+isort: uv.isort
+
+.PHONY: uv.isort
+uv.isort: uv.isort.format
+
 ###############################################################################
 
 
