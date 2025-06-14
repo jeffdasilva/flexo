@@ -4,6 +4,8 @@
 
 uv.exe := uv
 uv.uvx.exe := uvx
+uv.venv_dir = .venv
+uv.python.exe = $(uv.venv_dir)/bin/python
 
 uv.run.entrypoint ?= $(firstword $(wildcard main.py) $(wildcard *main.py))
 uv.project_config ?= pyproject.toml
@@ -143,6 +145,7 @@ uv.ruff.check:
 
 uv.mypy.args += \
 	$(if $(uv.project_config),--config-file=$(uv.project_config)) \
+	--python-executable=$(uv.python.exe) \
 	--install-types --non-interactive \
 	--strict \
 	--pretty \
