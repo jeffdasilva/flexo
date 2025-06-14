@@ -145,8 +145,9 @@ uv.ruff.check:
 
 uv.mypy.args += \
 	$(if $(uv.project_config),--config-file=$(uv.project_config)) \
+	--non-interactive \
 	--python-executable=$(uv.python.exe) \
-	--install-types --non-interactive \
+	--install-types \
 	--strict \
 	--pretty \
 	--ignore-missing-imports \
