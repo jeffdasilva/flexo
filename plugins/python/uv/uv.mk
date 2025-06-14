@@ -83,9 +83,16 @@ uv.run: $(uv.run.entrypoint)
 
 clean: uv.clean
 
+uv.clean.cache_dirs += \
+	$(uv.pylint.cache_dir) \
+	.mypy_cache \
+	.pytest_cache \
+	.ruff_cache
+
 .PHONY: uv.clean
 uv.clean:
 	@find . -name __pycache__ -type d -exec rm -rvf {} +
+	$(if $(wildcard $(uv.clean.cache_dirs)),rm -rf $(wildcard $(uv.clean.cache_dirs)))
 
 ###############################################################################
 
