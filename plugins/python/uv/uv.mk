@@ -6,6 +6,7 @@ uv.exe := uv
 uv.uvx.exe := uvx
 
 uv.run.entrypoint ?= $(firstword $(wildcard main.py) $(wildcard *main.py))
+uv.project_config ?= pyproject.toml
 
 ###############################################################################
 
@@ -132,9 +133,16 @@ uv.check: uv.ruff.check uv.mypy.check
 uv.ruff.check:
 	$(uv.uvx.exe) ruff check
 
+uv.mypy.args += \
+	$(if $(uv.project_config),--config-file=$(uv.project_config)) \
+	--strict \
+	--pretty \
+	--ignore-missing-imports \
+	--show-error-code-links
+
 .PHONY: uv.mypy.check
-uv.mypy.check:
-	$(uv.uvx.exe) mypy --pretty --strict --ignore-missing-imports --show-error-code-links .
+uv.mypy.check: $(uv.project_config)
+	$(uv.uvx.exe) mypy $(uv.mypy.args) .
 
 .PHONY: mypy
 mypy: uv.mypy
@@ -154,6 +162,8 @@ ty: uv.ty
 ###############################################################################
 # Linting
 
+uv.pylint.cache_dir = .pylint_cache
+
 .PHONY: lint
 lint: uv.lint
 
@@ -167,16 +177,22 @@ uv.pylint: $(uv.pylint.targets)
 
 uv.pylint.args += \
 	$(pylint.args) \
+	--logging-format-style=new \
 	--output-format=colorized \
 	--disable=import-error \
-	--logging-format-style=new \
-	--disable=logging-fstring-interpolation \
-	--disable=global-statement
+	--disable=logging-fstring-interpolation
 
 .PHONY: $(uv.pylint.targets)
-$(uv.pylint.targets): uv-pylint-%: %
-	$(uv.uvx.exe) pylint $(uv.pylint.args) $<
+$(uv.pylint.targets): uv-pylint-%: $(uv.pylint.cache_dir)/%.pytest-check
 
+$(uv.pylint.cache_dir)/%.pytest-check: % $(uv.project_config) | $$(@D)/.f
+	$(uv.uvx.exe) pylint $(uv.pylint.args) $<
+	@touch $@
+
+.PRECIOUS: $(uv.pylint.cache_dir)/%.f
+$(uv.pylint.cache_dir)/%.f:
+	@mkdir -p $(@D)
+	@touch $@
 
 ###############################################################################
 
