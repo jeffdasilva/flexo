@@ -142,9 +142,11 @@ uv.ruff.check:
 
 uv.mypy.args += \
 	$(if $(uv.project_config),--config-file=$(uv.project_config)) \
+	--install-types --non-interactive \
 	--strict \
 	--pretty \
 	--ignore-missing-imports \
+	--follow-untyped-imports \
 	--show-error-code-links
 
 .PHONY: uv.mypy.check
