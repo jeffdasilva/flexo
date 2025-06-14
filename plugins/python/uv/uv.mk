@@ -21,11 +21,12 @@ uv.install:
 		@echo "Installing uv..."; curl -LsSf https://astral.sh/uv/install.sh | sh)
 
 
-uv.tools.packages = \
+uv.tools.packages += \
+	pip \
 	ruff \
-	mypy
+	mypy \
 
-# I think these should be installed as normal python packages and not as uv tools.
+# I think these should sometimes be installed as normal python packages and not as uv tools.
 #uv.tools.packages += \
 #   pytest \
 #	pytest-asyncio \
