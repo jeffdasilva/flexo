@@ -8,9 +8,12 @@
 # substitute "libasound2t64 libasound2-plugins" instead of "libasound2"
 # unfortunately, this install method doesn't work with 'act' under wsl2
 
+
+selenium.install_dir ?= $(if $(wildcard $(HOME)),$(abspath $(HOME)/.flexo/bin),bin)
+
 #selenium.chrome.exe = google-chrome
-selenium.chrome.exe = bin/chrome-linux64/chrome
-selenium.chromedriver.exe = bin/chromedriver-linux64/chromedriver
+selenium.chrome.exe = $(selenium.install_dir)/chrome-linux64/chrome
+selenium.chromedriver.exe = $(selenium.install_dir)/chromedriver-linux64/chromedriver
 
 selenium.chrome.installed = $(or $(call have_exe,$(selenium.chrome.exe)),$(wildcard $(selenium.chrome.exe)))
 selenium.chromedriver.installed = $(or $(call have_exe,$(selenium.chromedriver.exe)),$(wildcard $(selenium.chromedriver.exe)))
@@ -41,8 +44,9 @@ ifeq ($(selenium.chrome.installed),)
 
 	@echo "[$@] Download the latest Chrome binary..."
 
-	rm -f chrome-linux64.zip*
-	wget $(call selenium.chrome.latest_url,chrome)
+	mkdir -p $(selenium.install_dir)
+	rm -f $(selenium.install_dir)/chrome-linux64.zip*
+	wget --directory-prefix=$(selenium.install_dir)/ $(call selenium.chrome.latest_url,chrome)
 
 # This only works with wsl2, and not with 'act' under wsl2. (leave disabled for now)
 #	@echo "[$@] Install Chrome dependencies..."
@@ -54,9 +58,8 @@ ifeq ($(selenium.chrome.installed),)
     	libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 \
     	libxrandr2 libxrender1 libxss1 libxtst6 lsb-release wget xdg-utils
 
-	mkdir -p bin
-	unzip -o chrome-linux64.zip -d bin
-	rm -f chrome-linux64.zip
+	unzip -o $(selenium.install_dir)/chrome-linux64.zip -d $(selenium.install_dir)
+	rm -f $(selenium.install_dir)/chrome-linux64.zip
 
 endif # selenium.chrome.installed
 
@@ -73,11 +76,11 @@ ifeq ($(selenium.chromedriver.installed),)
 
 	@echo "[$@] Download the latest Chromedriver binary..."
 
-	rm -f chromedriver-linux64.zip*
-	wget $(call selenium.chrome.latest_url,chromedriver)
+	mkdir -p $(selenium.install_dir)
+	rm -f $(selenium.install_dir)/chromedriver-linux64.zip*
+	wget --directory-prefix=$(selenium.install_dir)/  $(call selenium.chrome.latest_url,chromedriver)
 
-	mkdir -p bin
-	unzip -o chromedriver-linux64.zip -d bin
-	rm -f chromedriver-linux64.zip
+	unzip -o $(selenium.install_dir)/chromedriver-linux64.zip -d $(selenium.install_dir)
+	rm -f $(selenium.install_dir)/chromedriver-linux64.zip
 
 endif
