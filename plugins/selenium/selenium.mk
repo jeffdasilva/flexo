@@ -25,9 +25,14 @@ selenium.chrome.latest_url = $(shell \
 .PHONY: selenium.install
 selenium.install:
 
+.PHONY: selenium.prereq.install
+selenium.prereq.install:
+	@echo "[$@] Install prerequisite system packages..."
+	sudo apt install -y wget curl unzip jq
+
 selenium.install: selenium.chrome.install
 .PHONY: selenium.chrome.install
-selenium.chrome.install:
+selenium.chrome.install: selenium.prereq.install
 ifeq ($(selenium.chrome.exe),google-chrome)
 
 	$(if $(or $(filter $@,$(MAKECMDGOALS)),$(call do_not_have_exe,$(selenium.chrome.exe))),\
@@ -38,9 +43,6 @@ ifeq ($(selenium.chrome.exe),google-chrome)
 else # if $(selenium.chrome.exe) is not google-chrome
 
 ifeq ($(selenium.chrome.installed),)
-
-	@echo "[$@] Install prerequisite system packages..."
-	sudo apt install -y wget curl unzip jq
 
 	@echo "[$@] Download the latest Chrome binary..."
 
@@ -71,7 +73,7 @@ selenium.install: selenium.chromedriver.install
 .PHONY: selenium.chromedriver.install
 selenium.chromedriver.install: selenium.chrome.install
 
-selenium.chromedriver.install:
+selenium.chromedriver.install: selenium.prereq.install
 ifeq ($(selenium.chromedriver.installed),)
 
 	@echo "[$@] Download the latest Chromedriver binary..."

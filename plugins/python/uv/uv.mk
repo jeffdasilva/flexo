@@ -145,14 +145,14 @@ uv.ruff.check:
 
 uv.mypy.args += \
 	$(if $(uv.project_config),--config-file=$(uv.project_config)) \
-	--non-interactive \
 	--python-executable=$(uv.python.exe) \
-	--install-types \
 	--strict \
 	--pretty \
 	--ignore-missing-imports \
 	--follow-untyped-imports \
 	--show-error-code-links
+
+#uv.mypy.args += --non-interactive --install-types
 
 .PHONY: uv.mypy.check
 uv.mypy.check: $(uv.project_config)
