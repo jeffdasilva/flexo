@@ -91,7 +91,8 @@ uv.clean.cache_dirs += \
 	$(uv.pylint.cache_dir) \
 	.mypy_cache \
 	.pytest_cache \
-	.ruff_cache
+	.ruff_cache \
+	.testmondata*
 
 .PHONY: uv.clean
 uv.clean:
