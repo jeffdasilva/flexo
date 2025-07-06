@@ -26,7 +26,7 @@ uv.install:
 uv.tools.packages += \
 	pip \
 	ruff \
-	mypy \
+	mypy
 
 # I think these should sometimes be installed as normal python packages and not as uv tools.
 #uv.tools.packages += \
@@ -42,6 +42,7 @@ $(uv.install.tools.targets): uv.install.tools-%: uv.install
 
 .PHONY: uv.install.tools
 uv.install.tools: $(uv.install.tools.targets)
+	uv add --dev mypy pylint pytest pytest-asyncio $(if $(call flexo.true,$(pytest.testmon.enabled)),pytest-testmon)
 
 ###############################################################################
 
@@ -156,7 +157,7 @@ uv.mypy.args += \
 
 .PHONY: uv.mypy.check
 uv.mypy.check: $(uv.project_config)
-	$(uv.uvx.exe) mypy $(uv.mypy.args) .
+	$(uv.exe) run mypy $(uv.mypy.args) .
 
 .PHONY: mypy
 mypy: uv.mypy
@@ -200,7 +201,7 @@ uv.pylint.args += \
 $(uv.pylint.targets): uv-pylint-%: $(uv.pylint.cache_dir)/%.pytest-check
 
 $(uv.pylint.cache_dir)/%.pytest-check: % $(uv.project_config) | $$(@D)/.f
-	$(uv.uvx.exe) pylint $(uv.pylint.args) $<
+	$(uv.exe) run pylint $(uv.pylint.args) $<
 	@touch $@
 
 .PRECIOUS: $(uv.pylint.cache_dir)/%.f
